@@ -116,11 +116,9 @@
                "Content-Type": "application/json",
             },
             body: JSON.stringify(orderData),
-        })
-            .then(function(response) {
+        }).then(function(response) {
                 return response.json();
-            })
-            .then(function(preference) {
+            }).then(function(preference) {
                 createPayButton(preference.id);
             });
 });
