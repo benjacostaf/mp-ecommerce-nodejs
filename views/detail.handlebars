@@ -54,7 +54,7 @@
                                     <div class="clearfix image-list xs-no-js as-util-relatedlink relatedlink" data-relatedlink="6|Powerbeats3 Wireless Earphones - Neighborhood Collection - Brick Red|MPXP2">
                                         <div class="as-tilegallery-element as-image-selected">
                                             <div class=""></div>
-                                            <img src="./assets/003.jpg" class="ir ir item-image as-producttile-image" alt="" width="445" height="445" style="content:-webkit-image-set(url({{ img }}) 2x);">
+                                            <img id="product-image" src="./assets/003.jpg" class="ir ir item-image as-producttile-image" alt="" width="445" height="445" style="content:-webkit-image-set(url({{ data.img }}) 2x);">
                                         </div>
                                         
                                     </div>
@@ -72,19 +72,15 @@
                                 <div class="as-producttile-title">
                                     <h3 class="as-producttile-name">
                                         <p class="as-producttile-tilelink">
-                                            <span data-ase-truncate="2"> {{ title }} </span>
+                                            <span data-ase-truncate="2" id="product-title">{{ data.title }}</span>
                                         </p>
 
                                     </h3>
                                 </div>
-                                <h3 >
-                                    {{ price }}
-                                </h3>
-                                <h3 >
-                                    {{ unit }}
-                                </h3>
+                                <h3 id="unit-price">{{ data.price }}</h3>
+                                <h3 id="quantity">{{ data.unit }}</h3>
                             </div>
-                            <button type="submit" class="mercadopago-button" formmethod="post">Pagar</button>
+                            <button id="payrun" type="submit" class="mercadopago-button" formmethod="post">Pagar</button>
                         </div>
                     </div>
                 </div>
@@ -92,4 +88,52 @@
         </div>
     </div>
 </div>
-   
+
+<button id="mercadopago-button" ></button>
+<script src="https://sdk.mercadopago.com/js/v2"></script>
+<script>
+    const mp = new MercadoPago('APP_USR-42e953e6-2f0e-4c65-b7c3-ed6c76970cb2', {
+        locale: 'es-AR' // The most common are: 'pt-BR', 'es-AR' and 'en-US'
+    });
+
+    $('#payrun').click(function(){
+
+        const orderData = {
+            quantity: document.getElementById("quantity").innerHTML,
+            title: document.getElementById("product-title").innerHTML,
+            price: document.getElementById("unit-price").innerHTML,
+            description: 'Dispositivo móvil de Tienda e-commerce',
+            img: $('#product-image').prop('src'),
+            id: 1234
+        };
+
+        console.log(orderData);
+        console.log(JSON.stringify(orderData));
+
+        fetch("/create_preference", {
+            method: "POST",
+            headers: {
+               "Content-Type": "application/json",
+            },
+            body: JSON.stringify(orderData),
+        })
+            .then(function(response) {
+                return response.json();
+            })
+            .then(function(preference) {
+                createPayButton(preference.id);
+            });
+});
+
+    function createPayButton(preferenceId){
+        mp.checkout({
+            preference: {
+                id: preferenceId,
+            },
+            render: {
+                    container: '#mercadopago-button', // Indica el nombre de la clase donde se mostrará el botón de pago
+                    label: 'Pagar la compra', // Cambia el texto del botón de pago (opcional)
+            }
+        });
+    }
+</script>
