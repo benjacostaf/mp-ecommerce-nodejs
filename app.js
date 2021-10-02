@@ -28,8 +28,6 @@ app.get('/detail', function (req, res) {
 });
 
 app.post('/create_preference', (req, res) => {
-    console.log('server create');
-    console.log(req.body);
     let preference = {
         items: [
             {
@@ -80,10 +78,7 @@ app.post('/create_preference', (req, res) => {
         }
     };
 
-    console.log(preference);
-
     mercadopago.preferences.create(preference).then(function(response){
-        console.log(response);
         res.json({
             id: response.body.id
         });
